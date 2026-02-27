@@ -6,13 +6,24 @@ from app.core.database import Base, get_db
 from app.main import app
 from app.schemas.user import UserCreate
 from app.crud.user import user_crud
+from app.models.user import User  # Import User to ensure it's registered with Base
+import tempfile
+import os
 
 
-TEST_DATABASE_URL = "sqlite:///:memory:"
+# Use a file-based database for tests
+@pytest.fixture
+def test_db_file():
+    """Create a temporary database file"""
+    fd, path = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
+    yield path
+    os.unlink(path)
 
 
 @pytest.fixture
-def test_db():
+def test_db(test_db_file):
+    TEST_DATABASE_URL = f"sqlite:///{test_db_file}"
     engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -21,6 +32,7 @@ def test_db():
         yield db
     finally:
         db.close()
+        engine.dispose()
 
 
 @pytest.fixture
@@ -36,6 +48,7 @@ def client(test_db):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+    test_db.rollback()
 
 
 def test_register_user(client):
