@@ -17,6 +17,31 @@ from app.schemas.user import UserCreate, UserResponse
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+def _authenticate_and_create_token(db: Session, username: str, password: str) -> Token:
+    """
+    私有辅助函数：验证用户凭据并创建访问令牌
+
+    - **username**: 用户名
+    - **password**: 密码
+
+    返回 Token 对象
+    """
+    user = user_crud.authenticate(db, username=username, password=password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="用户名或密码错误",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
     """
@@ -61,22 +86,9 @@ def login(
 
     返回 JWT access token
     """
-    user = user_crud.authenticate(
-        db, username=form_data.username, password=form_data.password
+    return _authenticate_and_create_token(
+        db=db, username=form_data.username, password=form_data.password
     )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-
-    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/login/json", response_model=Token)
@@ -90,22 +102,9 @@ def login_json(login_data: LoginRequest, db: Session = Depends(get_db)) -> Any:
 
     返回 JWT access token
     """
-    user = user_crud.authenticate(
-        db, username=login_data.username, password=login_data.password
+    return _authenticate_and_create_token(
+        db=db, username=login_data.username, password=login_data.password
     )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-
-    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.get("/me", response_model=UserResponse)
