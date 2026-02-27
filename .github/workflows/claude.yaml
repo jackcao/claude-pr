@@ -33,27 +33,15 @@ jobs:
             - name: Run Claude Code
               id: claude
               uses: anthropics/claude-code-action@v1
+              env:
+                  ANTHROPIC_API_URL: "https://open.bigmodel.cn/api/anthropic"
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
-                  # Optional: Customize the trigger phrase (default: @claude)
-                  # trigger_phrase: "/claude"
-
-                  # Optional: Trigger when specific user is assigned to an issue
-                  # assignee_trigger: "claude-bot"
-
-                  # Optional: Configure Claude's behavior with CLI arguments
+                  prompt: |
+                      请严格审查代码，重点检查：
+                      1. 潜在的语法错误和逻辑 bug
+                      2. 代码规范和可读性问题
+                      3. 性能优化建议
                   claude_args: |
+                      --append-system-prompt "Follow our coding standards"
                       --model glm-5
-                  #   --max-turns 10
-                  #   --allowedTools "Bash(npm install),Bash(npm run build),Bash(npm run test:*),Bash(npm run lint:*)"
-                  #   --system-prompt "Follow our coding standards. Ensure all new code has tests. Use TypeScript for new files."
-
-                  # Optional: Advanced settings configuration
-                  settings: |
-                      {
-                        "env": {
-                          "NODE_ENV": "test",
-                          "API_URL": "https://open.bigmodel.cn/api/anthropic"
-                        }
-                      }
