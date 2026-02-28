@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mypy app/core/database.py --show-error-codes)",
+      "Bash(/Users/jackcao/vibe-coding/claude-pr/.venv/bin/pip install bcrypt)",
+      "Bash(uv venv)",
+      "Bash(git ls-tree -r --name-only 4b480e8)",
+      "Bash(git checkout 4b480e8 -- tests/)",
+      "Bash(git checkout 4b480e8 -- app/)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Skill(commit-commands:commit-push-pr:*)",
+      "Bash(git checkout --ours app/api/deps.py app/api/v1/auth.py app/core/database.py app/core/security.py app/crud/user.py app/main.py app/schemas/user.py tests/api/test_auth.py tests/test_config.py tests/test_deps.py tests/test_main.py tests/test_schemas.py tests/test_security.py tests/test_user_crud.py tests/test_user_model.py)"
+    ]
+  }
+}
