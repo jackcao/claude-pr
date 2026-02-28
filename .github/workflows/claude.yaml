@@ -27,13 +27,14 @@ jobs:
               with:
                   fetch-depth: 1
 
-            # 传入 github.token 让 action 跳过 OIDC，避免 “workflow 必须与默认分支一致” 校验
-            # 若仍报错，可在仓库 Secrets 添加 PAT 并改为: github_token: ${{ secrets.PAT }}
+            # 地方模型 / 自定义兼容 Anthropic 的 API（参考 cloud-providers.md 的 Direct API 方式）
+            # 通过 env.ANTHROPIC_BASE_URL 指定基地址，anthropic_api_key 用该平台的 API Key，claude_args 里 --model 用平台模型名
+            # 传入 github_token 以跳过 OIDC，避免 PR 触发时 “workflow 必须与默认分支一致” 校验
             - name: Run Claude Code
               id: claude
               uses: anthropics/claude-code-action@v1
               env:
-                  ANTHROPIC_API_URL: "https://open.bigmodel.cn/api/anthropic"
+                  ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
                   github_token: ${{ github.token }}
@@ -45,4 +46,4 @@ jobs:
                       3. 性能优化建议
                   claude_args: |
                       --append-system-prompt "Follow our coding standards"
-                      --model GLM-4.7
+                      --model glm-5
