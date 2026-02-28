@@ -1,0 +1,27 @@
+stages:
+  - ai
+
+claude:
+  stage: ai
+  image: node:24-alpine3.21
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  variables:
+    GIT_STRATEGY: fetch
+    # 自定义兼容 Anthropic 的 API 基地址（智谱 GLM）
+    ANTHROPIC_BASE_URL: "https://open.bigmodel.cn/api/anthropic"
+  before_script:
+    - apk update
+    - apk add --no-cache git curl bash
+    - curl -fsSL https://claude.ai/install.sh | bash
+  script:
+    - /bin/gitlab-mcp-server || true
+    - >
+      claude
+      -p "${AI_FLOW_INPUT:-'请严格审查代码，重点检查：1. 潜在的语法错误和逻辑 bug 2. 代码规范和可读性问题 3. 性能优化建议'}"
+      --model glm-5
+      --append-system-prompt "Follow our coding standards"
+      --permission-mode acceptEdits
+      --allowedTools "Bash Read Edit Write mcp__gitlab"
+      --debug
