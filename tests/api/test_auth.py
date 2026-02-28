@@ -1,13 +1,14 @@
-import os
-import tempfile
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from app.core.database import Base, get_db
 from app.main import app
+from app.schemas.user import UserCreate
+from app.crud.user import user_crud
+from app.models.user import User  # Import User to ensure it's registered with Base
+import tempfile
+import os
 
 
 # Use a file-based database for tests
@@ -37,7 +38,6 @@ def test_db(test_db_file):
 @pytest.fixture
 def client(test_db):
     """创建测试客户端"""
-
     def override_get_db():
         try:
             yield test_db
@@ -58,8 +58,8 @@ def test_register_user(client):
         json={
             "username": "testuser",
             "email": "test@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
     assert response.status_code == 201
     data = response.json()
@@ -77,8 +77,8 @@ def test_register_duplicate_username(client):
         json={
             "username": "testuser",
             "email": "test@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
 
     # 第二次注册相同用户名
@@ -87,8 +87,8 @@ def test_register_duplicate_username(client):
         json={
             "username": "testuser",
             "email": "another@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
     assert response.status_code == 400
 
@@ -101,13 +101,17 @@ def test_login_success(client):
         json={
             "username": "testuser",
             "email": "test@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
 
     # 登录
     response = client.post(
-        "/api/v1/auth/login", data={"username": "testuser", "password": "testpass123"}
+        "/api/v1/auth/login",
+        data={
+            "username": "testuser",
+            "password": "testpass123"
+        }
     )
     assert response.status_code == 200
     data = response.json()
@@ -123,13 +127,17 @@ def test_login_wrong_password(client):
         json={
             "username": "testuser",
             "email": "test@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
 
     # 错误密码登录
     response = client.post(
-        "/api/v1/auth/login", data={"username": "testuser", "password": "wrongpass"}
+        "/api/v1/auth/login",
+        data={
+            "username": "testuser",
+            "password": "wrongpass"
+        }
     )
     assert response.status_code == 401
 
@@ -138,7 +146,10 @@ def test_login_nonexistent_user(client):
     """测试不存在用户登录失败"""
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": "nonexistent", "password": "testpass123"},
+        data={
+            "username": "nonexistent",
+            "password": "testpass123"
+        }
     )
     assert response.status_code == 401
 
@@ -157,17 +168,22 @@ def test_get_me_with_valid_token(client):
         json={
             "username": "testuser",
             "email": "test@example.com",
-            "password": "testpass123",
-        },
+            "password": "testpass123"
+        }
     )
     login_response = client.post(
-        "/api/v1/auth/login", data={"username": "testuser", "password": "testpass123"}
+        "/api/v1/auth/login",
+        data={
+            "username": "testuser",
+            "password": "testpass123"
+        }
     )
     token = login_response.json()["access_token"]
 
     # 访问受保护路由
     response = client.get(
-        "/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
     data = response.json()

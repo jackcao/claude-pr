@@ -1,5 +1,6 @@
-from app.core.database import Base, engine
 from app.models.user import User
+from sqlalchemy.orm import Session
+from app.core.database import engine, Base
 
 
 def test_user_table_creation():
@@ -11,8 +12,8 @@ def test_user_table_creation():
 
 def test_user_fields():
     """验证用户模型有正确的字段"""
-    assert hasattr(User, "id")
-    assert hasattr(User, "username")
-    assert hasattr(User, "email")
-    assert hasattr(User, "hashed_password")
-    assert hasattr(User, "is_active")
+    assert hasattr(User, 'id')
+    assert hasattr(User, 'username')
+    assert hasattr(User, 'email')
+    assert hasattr(User, 'hashed_password')
+    assert hasattr(User, 'is_active')

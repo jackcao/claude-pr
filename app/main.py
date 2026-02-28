@@ -29,7 +29,7 @@ def read_root():
     return {
         "message": f"Welcome to {settings.APP_NAME}",
         "version": settings.VERSION,
-        "docs": "/docs",
+        "docs": "/docs"
     }
 
 

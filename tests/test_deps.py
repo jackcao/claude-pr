@@ -1,11 +1,11 @@
 import pytest
+from app.core.security import create_access_token
+from app.schemas.user import UserCreate
+from app.crud.user import user_crud
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from app.core.database import Base
-from app.core.security import create_access_token
-from app.crud.user import user_crud
-from app.schemas.user import UserCreate
+
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
@@ -26,7 +26,9 @@ def test_get_current_user_valid_token(test_db):
     """测试有效 token 获取用户"""
     # 创建测试用户
     user_data = UserCreate(
-        username="testuser", email="test@example.com", password="testpass123"
+        username="testuser",
+        email="test@example.com",
+        password="testpass123"
     )
     user = user_crud.create(test_db, user_data)
 

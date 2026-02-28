@@ -1,4 +1,4 @@
-from app.core.security import get_password_hash, verify_password
+from app.core.security import verify_password, get_password_hash
 
 
 def test_password_hashing():
@@ -48,7 +48,6 @@ def test_decode_access_token():
 def test_decode_expired_token():
     """验证过期 token 解码失败"""
     from datetime import timedelta
-
     from app.core.security import create_access_token, decode_access_token
 
     # 创建一个已过期的 token (过期时间设为过去)
@@ -73,7 +72,6 @@ def test_decode_invalid_token():
 def test_create_token_with_custom_expiration():
     """验证自定义过期时间的 token"""
     from datetime import timedelta
-
     from app.core.security import create_access_token, decode_access_token
 
     data = {"sub": "testuser"}

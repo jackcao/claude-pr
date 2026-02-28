@@ -1,12 +1,13 @@
+import os
 from app.core.config import settings
 
 
 def test_settings_exist():
     """验证配置对象存在且包含必需字段"""
-    assert hasattr(settings, "SECRET_KEY")
-    assert hasattr(settings, "ALGORITHM")
-    assert hasattr(settings, "ACCESS_TOKEN_EXPIRE_MINUTES")
-    assert hasattr(settings, "DATABASE_URL")
+    assert hasattr(settings, 'SECRET_KEY')
+    assert hasattr(settings, 'ALGORITHM')
+    assert hasattr(settings, 'ACCESS_TOKEN_EXPIRE_MINUTES')
+    assert hasattr(settings, 'DATABASE_URL')
 
 
 def test_default_values():

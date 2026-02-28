@@ -42,9 +42,7 @@ def _authenticate_and_create_token(db: Session, username: str, password: str) ->
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
     """
     用户注册
@@ -57,14 +55,16 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
     user_by_username = user_crud.get_by_username(db, username=user_in.username)
     if user_by_username:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被注册"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="用户名已被注册"
         )
 
     # 检查邮箱是否已存在
     user_by_email = user_crud.get_by_email(db, email=user_in.email)
     if user_by_email:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱已被注册"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="邮箱已被注册"
         )
 
     # 创建新用户
@@ -74,7 +74,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
 
 @router.post("/login", response_model=Token)
 def login(
-    db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
     用户登录（OAuth2 兼容）
@@ -107,7 +108,9 @@ def login_json(login_data: LoginRequest, db: Session = Depends(get_db)) -> Any:
 
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: User = Depends(get_current_active_user)) -> Any:
+def get_current_user_info(
+    current_user: User = Depends(get_current_active_user)
+) -> Any:
     """
     获取当前用户信息
 
