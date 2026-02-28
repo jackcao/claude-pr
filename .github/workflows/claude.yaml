@@ -27,15 +27,8 @@ jobs:
               with:
                   fetch-depth: 1
 
-            # 使用 GitHub App token 避免 PR 触发时的 “workflow 必须与默认分支一致” 校验
-            # 需在仓库中创建 GitHub App，并配置 Variables: APP_ID；Secrets: GH_APP_PRIVATE_KEY
-            - name: Create GitHub App token
-              id: app-token
-              uses: actions/create-github-app-token@v2
-              with:
-                  app-id: ${{ secrets.GH_APP_ID }}
-                  private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-
+            # 传入 github.token 让 action 跳过 OIDC，避免 “workflow 必须与默认分支一致” 校验
+            # 若仍报错，可在仓库 Secrets 添加 PAT 并改为: github_token: ${{ secrets.PAT }}
             - name: Run Claude Code
               id: claude
               uses: anthropics/claude-code-action@v1
@@ -43,7 +36,7 @@ jobs:
                   ANTHROPIC_API_URL: "https://open.bigmodel.cn/api/anthropic"
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-                  github_token: ${{ steps.app-token.outputs.token }}
+                  github_token: ${{ github.token }}
                   show_full_output: true
                   prompt: |
                       请严格审查代码，重点检查：
