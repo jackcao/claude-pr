@@ -34,6 +34,7 @@ jobs:
                   ANTHROPIC_API_URL: "https://open.bigmodel.cn/api/anthropic"
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  show_full_output: true
                   prompt: |
                       请严格审查代码，重点检查：
                       1. 潜在的语法错误和逻辑 bug
