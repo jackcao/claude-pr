@@ -38,7 +38,6 @@ jobs:
               with:
                   anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
                   github_token: ${{ github.token }}
-                  show_full_output: true
                   prompt: |
                       请严格审查代码，重点检查：
                       1. 潜在的语法错误和逻辑 bug
